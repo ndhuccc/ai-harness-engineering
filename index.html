@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Harness Engineering — 駕馭 AI 的工程學</title>
+<style>
+  :root { --bg:#0a0f1e; --card:#111a33; --accent:#4f7cff; --accent2:#00d4aa; --text:#e8ecff; --muted:#8b95bb; --border:#1e2a4a; }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Inter','Noto Sans TC',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.7}
+  a{color:var(--accent)}
+  /* nav */
+  nav{position:sticky;top:0;z-index:10;display:flex;justify-content:space-between;align-items:center;padding:14px 6vw;background:rgba(10,15,30,.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+  nav .logo{font-weight:800;letter-spacing:.04em;font-size:1.05rem}
+  nav .logo span{color:var(--accent)}
+  nav .links a{margin-left:18px;font-size:.9rem;text-decoration:none;color:var(--muted)}
+  nav .links a:hover{color:var(--text)}
+  /* hero */
+  .hero{padding:72px 6vw 48px;display:grid;grid-template-columns:1.15fr .85fr;gap:40px;align-items:center;max-width:1200px;margin:0 auto}
+  .badge{display:inline-flex;gap:8px;align-items:center;background:#1a2450;border:1px solid #243470;color:#7ea0ff;font-size:.78rem;padding:4px 12px;border-radius:999px;margin-bottom:16px}
+  .hero h1{font-size:clamp(2rem,4.5vw,3.1rem);line-height:1.15;font-weight:900}
+  .hero h1 em{font-style:normal;background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+  .hero p{color:var(--muted);margin:16px 0 24px;font-size:1.02rem}
+  .cta{display:flex;gap:12px;flex-wrap:wrap}
+  .btn{padding:11px 22px;border-radius:10px;font-weight:700;font-size:.92rem;text-decoration:none;display:inline-block;cursor:pointer;border:none}
+  .btn-primary{background:linear-gradient(135deg,var(--accent),#6a8eff);color:#fff;box-shadow:0 8px 24px rgba(79,124,255,.35)}
+  .btn-ghost{background:transparent;border:1px solid var(--border);color:var(--text)}
+  .hero-visual{background:linear-gradient(145deg,#16204a,#0e1a3a);border:1px solid var(--border);border-radius:20px;padding:22px;position:relative;overflow:hidden}
+  .hero-visual::before{content:'';position:absolute;inset:-40% -20%;background:radial-gradient(ellipse at 60% 40%,rgba(79,124,255,.18),transparent 60%)}
+  .code{position:relative;background:#0b122c;border:1px solid #1e2e5a;border-radius:12px;padding:14px 16px;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:.82rem;color:#b8c6f0;line-height:1.6;overflow-x:auto}
+  .code .kw{color:#7ea0ff}.code .str{color:#00d4aa}.code .cmt{color:#55608a}
+  /* sections */
+  section{max-width:1200px;margin:0 auto;padding:56px 6vw}
+  .section-label{color:var(--accent2);font-size:.78rem;letter-spacing:.14em;font-weight:700;margin-bottom:8px}
+  h2{font-size:clamp(1.5rem,3vw,2rem);margin-bottom:10px}
+  .sub{color:var(--muted);margin-bottom:28px;max-width:680px}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:22px}
+  .card .icon{width:40px;height:40px;border-radius:10px;display:grid;place-items:center;font-size:1.2rem;margin-bottom:12px}
+  .card h3{font-size:1rem;margin-bottom:6px}
+  .card p{color:var(--muted);font-size:.9rem}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .stack{display:grid;gap:14px}
+  .row{display:grid;grid-template-columns:52px 1fr;gap:14px;align-items:start;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px}
+  .num{width:40px;height:40px;border-radius:10px;background:#1a2450;border:1px solid #243470;display:grid;place-items:center;font-weight:800;color:#7ea0ff;font-size:.95rem}
+  .row h4{font-size:.98rem}.row p{color:var(--muted);font-size:.86rem;margin-top:2px}
+  .arch{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;overflow-x:auto}
+  .arch pre{font-family:'JetBrains Mono',monospace;font-size:.82rem;color:#b8c6f0;line-height:1.7;white-space:pre}
+  .arch .hl{color:#7ea0ff;font-weight:700}
+  .quote{background:linear-gradient(135deg,#16204a,#13203e);border:1px solid var(--border);border-radius:16px;padding:22px;display:grid;grid-template-columns:1fr auto;gap:16px;align-items:center}
+  .quote p{color:#c2ccec;font-size:.95rem}
+  footer{text-align:center;padding:36px 6vw;color:var(--muted);font-size:.82rem;border-top:1px solid var(--border);margin-top:32px}
+  @media(max-width:860px){.hero{grid-template-columns:1fr}.grid3,.grid2{grid-template-columns:1fr}.quote{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<nav>
+  <div class="logo">⚙️ AI <span>Harness</span> Engineering</div>
+  <div class="links"><a href="#what">核心理念</a><a href="#arch">架構</a><a href="#workflow">工作流</a></div>
+</nav>
+
+<div class="hero">
+  <div>
+    <div class="badge">✦ Engineering Discipline &nbsp;·&nbsp; 2026</div>
+    <h1>別只會 <em>Prompt</em>，<br>要會駕馭 <em>整個系統</em></h1>
+    <p>AI Harness Engineering 是一門讓 LLM 穩定、可觀測、可回溯地融入真實工作流的工程學。從單次對話到自主代理，從手工試錯到可重現的管線。</p>
+    <div class="cta">
+      <a class="btn btn-primary" href="#what">開始探索 ↓</a>
+      <a class="btn btn-ghost" href="https://github.com" target="_blank">View on GitHub</a>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div style="font-size:.78rem;color:var(--muted);letter-spacing:.08em;margin-bottom:10px">HARNESS · MINIMAL EXAMPLE</div>
+    <div class="code"><span class="cmt"># harness.yaml — 宣告式駕馭</span><br><span class="kw">agent</span>:<br>&nbsp;&nbsp;<span class="kw">model</span>: <span class="str">gpt-4o-mini</span><br>&nbsp;&nbsp;<span class="kw">tools</span>: [search, browser, terminal]<br>&nbsp;&nbsp;<span class="kw">guardrails</span>:<br>&nbsp;&nbsp;&nbsp;&nbsp;- max_steps: <span class="str">12</span><br>&nbsp;&nbsp;&nbsp;&nbsp;- require_approval: [deploy, send_email]<br><span class="kw">memory</span>:<br>&nbsp;&nbsp;<span class="kw">episodic</span>: true &nbsp;<span class="cmt"># 跨輪記憶</span><br>&nbsp;&nbsp;<span class="kw">skills</span>: [web_search, file_ops]</div>
+    <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+      <span style="background:#1a2450;border:1px solid #243470;color:#7ea0ff;font-size:.72rem;padding:4px 10px;border-radius:999px">🔒 Guardrails</span>
+      <span style="background:#14332e;border:1px solid #1e4a3e;color:#00d4aa;font-size:.72rem;padding:4px 10px;border-radius:999px">🧠 Memory</span>
+      <span style="background:#2a1f3a;border:1px solid #3d2a5a;color:#c28bff;font-size:.72rem;padding:4px 10px;border-radius:999px">🛠 Tools</span>
+    </div>
+  </div>
+</div>
+
+<section id="what">
+  <div class="section-label">01 — WHAT IS IT</div>
+  <h2>什麼是 AI Harness？</h2>
+  <p class="sub">如果 Model 是引擎，Harness 就是車架、煞車、儀表板與導航——讓強大的模型在現實道路上安全前行。</p>
+  <div class="grid3">
+    <div class="card"><div class="icon" style="background:#1a2450">🎛️</div><h3>編排 Orchestration</h3><p>把工具、技能、記憶與工作流編成可重現的管線，而非一次性對話。</p></div>
+    <div class="card"><div class="icon" style="background:#14332e">🛡️</div><h3>護欄 Guardrails</h3><p>權限、審批、沙盒與可觀測性，讓自主行為可控、可審計。</p></div>
+    <div class="card"><div class="icon" style="background:#2a1f3a">🔁</div><h3>回饋 Feedback</h3><p>評估、重試、自我修正與人類介入點，形成閉環而非開環。</p></div>
+  </div>
+</section>
+
+<section id="arch">
+  <div class="section-label">02 — ARCHITECTURE</div>
+  <h2>典型架構</h2>
+  <p class="sub">從 User Intent 到 Side Effect，Harness 在中間承擔所有工程責任。</p>
+  <div class="grid2">
+    <div class="arch"><pre><span class="hl">User Intent</span> ─▶ <span class="hl">Harness</span> ─▶ <span class="hl">Model</span>
+              │            │
+              │     ┌──────┴──────┐
+              │     │ Tools / Skills / Memory │
+              │     └──────┬──────┘
+              │            ▼
+              │      <span class="hl">Guardrails</span> & Policy
+              │            │
+              └──── <span class="hl">Observability</span> ◀────┘
+                    (log / trace / eval)
+                          │
+                          ▼
+                    <span class="hl">Side Effects</span>
+              (file / api / deploy / message)</pre></div>
+    <div class="stack">
+      <div class="row"><div class="num">①</div><div><h4>宣告式配置</h4><p>用 YAML / JSON 宣告模型、工具、約束與記憶，而非散落的 prompt 字串。</p></div></div>
+      <div class="row"><div class="num">②</div><div><h4>技能化能力</h4><p>將可重用流程封裝為 Skill（可發現、可組合、可審計）。</p></div></div>
+      <div class="row"><div class="num">③</div><div><h4>可觀測與評估</h4><p>每一步皆有 trace、每輪皆可 eval，失敗可重現、成功可複製。</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section id="workflow">
+  <div class="section-label">03 — WORKFLOW</div>
+  <h2>從 Prompt 到 Production</h2>
+  <div class="grid3">
+    <div class="card"><div class="icon" style="background:#1a2450">🧪</div><h3>1 · Prototype</h3><p>在 Playground 驗證想法，用最少工具跑通一個端到端案例。</p></div>
+    <div class="card"><div class="icon" style="background:#14332e">🧱</div><h3>2 · Harden</h3><p>抽成 Skill、加上護欄與測試，讓「能跑」變成「每次都能跑」。</p></div>
+    <div class="card"><div class="icon" style="background:#2a1f3a">🚀</div><h3>3 · Ship</h3><p>部署為 Cron / Webhook / Chat Bot，持續觀測並迭代。</p></div>
+  </div>
+  <div class="quote" style="margin-top:18px">
+    <p>「Prompt Engineering 回答 <em>怎麼問</em>；Harness Engineering 回答 <em>怎麼讓它在真實世界穩定交付</em>。」</p>
+    <span style="background:var(--accent);color:#fff;font-size:.78rem;padding:6px 12px;border-radius:999px;white-space:nowrap">Design Principle</span>
+  </div>
+</section>
+
+<section style="padding-top:12px">
+  <div class="section-label">04 — STARTER CHECKLIST</div>
+  <h2>入門檢查清單</h2>
+  <div class="grid2">
+    <div class="card" style="background:#0e1633">
+      <h3>✅ 至少做到這些</h3>
+      <p style="margin-top:8px;line-height:2">
+        ☐ 每次執行皆有 log / trace<br>
+        ☐ 危險操作需人類審批<br>
+        ☐ 工具呼叫有 timeout 與重試<br>
+        ☐ 產出可被驗證（檔案存在、API 回應、測試通過）
+      </p>
+    </div>
+    <div class="card" style="background:#0e1633">
+      <h3>📚 延伸閱讀</h3>
+      <p style="margin-top:8px;line-height:2">
+        · Model Context Protocol (MCP)<br>
+        · 12-Factor Agents<br>
+        · Evals / Guardrails / Observability<br>
+        · Hermes Agent Skills 架構
+      </p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  Built for demo · AI Harness Engineering · Deployed via GitHub Pages · <span id="d"></span>
+</footer>
+<script>document.getElementById('d').textContent=new Date().toISOString().slice(0,10)</script>
+</body>
+</html>
