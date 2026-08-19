@@ -45,8 +45,7 @@
   .num{width:40px;height:40px;border-radius:10px;background:#1a2450;border:1px solid #243470;display:grid;place-items:center;font-weight:800;color:#7ea0ff;font-size:.95rem}
   .row h4{font-size:.98rem}.row p{color:var(--muted);font-size:.86rem;margin-top:2px}
   .arch{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;overflow-x:auto}
-  .arch pre{font-family:'JetBrains Mono',monospace;font-size:.82rem;color:#b8c6f0;line-height:1.7;white-space:pre}
-  .arch .hl{color:#7ea0ff;font-weight:700}
+  .arch svg{width:100%;height:auto;display:block}
   .quote{background:linear-gradient(135deg,#16204a,#13203e);border:1px solid var(--border);border-radius:16px;padding:22px;display:grid;grid-template-columns:1fr auto;gap:16px;align-items:center}
   .quote p{color:#c2ccec;font-size:.95rem}
   footer{text-align:center;padding:36px 6vw;color:var(--muted);font-size:.82rem;border-top:1px solid var(--border);margin-top:32px}
@@ -96,20 +95,89 @@
   <h2>典型架構</h2>
   <p class="sub">從 User Intent 到 Side Effect，Harness 在中間承擔所有工程責任。</p>
   <div class="grid2">
-    <div class="arch"><pre><span class="hl">User Intent</span> ─▶ <span class="hl">Harness</span> ─▶ <span class="hl">Model</span>
-              │            │
-              │     ┌──────┴──────┐
-              │     │ Tools / Skills / Memory │
-              │     └──────┬──────┘
-              │            ▼
-              │      <span class="hl">Guardrails</span> & Policy
-              │            │
-              └──── <span class="hl">Observability</span> ◀────┘
-                    (log / trace / eval)
-                          │
-                          ▼
-                    <span class="hl">Side Effects</span>
-              (file / api / deploy / message)</pre></div>
+    <div class="arch">
+<svg viewBox="0 0 520 340" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="archTitle archDesc">
+  <title id="archTitle">AI Harness 典型架構</title>
+  <desc id="archDesc">User Intent 經 Harness 與 Model 協作，透過 Tools Guardrails Observability 產出 Side Effects</desc>
+  <defs>
+    <linearGradient id="gBlue" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#4f7cff"/><stop offset="100%" stop-color="#7aa0ff"/></linearGradient>
+    <linearGradient id="gTeal" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#00d4aa"/><stop offset="100%" stop-color="#2be5c0"/></linearGradient>
+    <linearGradient id="gPurple" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#8b6cff"/><stop offset="100%" stop-color="#b08cff"/></linearGradient>
+    <filter id="glow"><feGaussianBlur stdDeviation="6" result="b"/><feColorMatrix values="1 1 1 0 0  1 1 1 0 0  1 1 1 0 0  0 0 0 0.35 0"/></filter>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#7ea0ff"/></marker>
+    <marker id="arrTeal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#00d4aa"/></marker>
+  </defs>
+  <!-- bg grid dots -->
+  <g opacity="0.35">
+    <circle cx="30" cy="30" r="1.2" fill="#1e2a4a"/><circle cx="90" cy="30" r="1.2" fill="#1e2a4a"/><circle cx="150" cy="30" r="1.2" fill="#1e2a4a"/><circle cx="210" cy="30" r="1.2" fill="#1e2a4a"/><circle cx="270" cy="30" r="1.2" fill="#1e2a4a"/><circle cx="330" cy="30" r="1.2" fill="#1e2a4a"/><circle cx="390" cy="30" r="1.2" fill="#1e2a4a"/><circle cx="450" cy="30" r="1.2" fill="#1e2a4a"/>
+    <circle cx="30" cy="90" r="1.2" fill="#1e2a4a"/><circle cx="90" cy="90" r="1.2" fill="#1e2a4a"/><circle cx="150" cy="90" r="1.2" fill="#1e2a4a"/><circle cx="210" cy="90" r="1.2" fill="#1e2a4a"/><circle cx="270" cy="90" r="1.2" fill="#1e2a4a"/><circle cx="330" cy="90" r="1.2" fill="#1e2a4a"/><circle cx="390" cy="90" r="1.2" fill="#1e2a4a"/><circle cx="450" cy="90" r="1.2" fill="#1e2a4a"/>
+  </g>
+  <!-- Top row: User Intent -> Harness -> Model -->
+  <!-- User Intent -->
+  <g>
+    <rect x="14" y="22" width="132" height="52" rx="14" fill="#16204a" stroke="#243470" stroke-width="1.2"/>
+    <text x="80" y="42" text-anchor="middle" font-size="11" font-weight="800" fill="#e8ecff" font-family="Inter,system-ui,sans-serif">👤 User Intent</text>
+    <text x="80" y="60" text-anchor="middle" font-size="8.5" fill="#8b95bb" font-family="Inter,system-ui,sans-serif">目標 · 需求 · 指令</text>
+  </g>
+  <!-- Harness (center, highlighted) -->
+  <g>
+    <rect x="194" y="16" width="140" height="64" rx="14" fill="url(#gBlue)" opacity="0.95"/>
+    <rect x="194" y="16" width="140" height="64" rx="14" fill="none" stroke="white" stroke-opacity="0.18" stroke-width="1.2"/>
+    <text x="264" y="40" text-anchor="middle" font-size="12.5" font-weight="900" fill="white" font-family="Inter,system-ui,sans-serif">⚙️ Harness</text>
+    <text x="264" y="60" text-anchor="middle" font-size="8.5" fill="white" opacity="0.92" font-family="Inter,system-ui,sans-serif">編排 · 約束 · 記憶</text>
+  </g>
+  <!-- Model -->
+  <g>
+    <rect x="380" y="22" width="126" height="52" rx="14" fill="#1a2450" stroke="#4f7cff" stroke-opacity="0.5" stroke-width="1.2"/>
+    <text x="443" y="42" text-anchor="middle" font-size="11" font-weight="800" fill="#e8ecff" font-family="Inter,system-ui,sans-serif">🧠 Model</text>
+    <text x="443" y="60" text-anchor="middle" font-size="8.5" fill="#8b95bb" font-family="Inter,system-ui,sans-serif">LLM · 推理 · 生成</text>
+  </g>
+  <!-- arrows top -->
+  <line x1="146" y1="48" x2="192" y2="48" stroke="#7ea0ff" stroke-width="1.6" marker-end="url(#arr)"/>
+  <line x1="334" y1="48" x2="378" y2="48" stroke="#7ea0ff" stroke-width="1.6" marker-end="url(#arr)"/>
+
+  <!-- Middle: Tools / Skills / Memory -->
+  <g>
+    <rect x="164" y="108" width="200" height="62" rx="14" fill="#111a33" stroke="#2a3a6a" stroke-width="1.2"/>
+    <text x="264" y="130" text-anchor="middle" font-size="10.5" font-weight="800" fill="#7ea0ff" font-family="Inter,system-ui,sans-serif">🛠  Tools · Skills · Memory</text>
+    <text x="264" y="148" text-anchor="middle" font-size="8" fill="#8b95bb" font-family="Inter,system-ui,sans-serif">search · browser · terminal · files · episodic</text>
+    <text x="264" y="160" text-anchor="middle" font-size="7.5" fill="#55608a" font-family="Inter,system-ui,sans-serif">可發現 · 可組合 · 可審計</text>
+  </g>
+  <!-- vertical from Harness down -->
+  <line x1="264" y1="80" x2="264" y2="106" stroke="#7ea0ff" stroke-width="1.6" marker-end="url(#arr)"/>
+
+  <!-- Guardrails -->
+  <g>
+    <rect x="164" y="188" width="200" height="52" rx="14" fill="#14332e" stroke="#1e6b57" stroke-width="1.2"/>
+    <text x="264" y="208" text-anchor="middle" font-size="10.5" font-weight="800" fill="#00d4aa" font-family="Inter,system-ui,sans-serif">🛡️ Guardrails &amp; Policy</text>
+    <text x="264" y="226" text-anchor="middle" font-size="8" fill="#8ab8b0" font-family="Inter,system-ui,sans-serif">審批 · 沙盒 · 權限 · timeout · 重試</text>
+  </g>
+  <line x1="264" y1="170" x2="264" y2="186" stroke="#00d4aa" stroke-width="1.6" marker-end="url(#arrTeal)"/>
+
+  <!-- Observability (side, with loop) -->
+  <g>
+    <rect x="14" y="188" width="124" height="52" rx="14" fill="#1a1e3a" stroke="#3d2a6a" stroke-width="1.1" stroke-dasharray="6 4"/>
+    <text x="76" y="208" text-anchor="middle" font-size="10" font-weight="800" fill="#b08cff" font-family="Inter,system-ui,sans-serif">👁 Observability</text>
+    <text x="76" y="226" text-anchor="middle" font-size="7.5" fill="#8b95bb" font-family="Inter,system-ui,sans-serif">log · trace · eval</text>
+  </g>
+  <!-- loop: Guardrails -> Observability -> Harness (dashed feedback) -->
+  <path d="M164 214 C 148 214, 142 214, 138 214" fill="none" stroke="#b08cff" stroke-width="1.3" stroke-dasharray="6 5" marker-end="url(#arr)"/>
+  <path d="M76 188 C 76 120, 76 96, 200 72" fill="none" stroke="#b08cff" stroke-width="1.2" stroke-dasharray="6 5" opacity="0.9"/>
+  <text x="108" y="162" font-size="7" fill="#b08cff" opacity="0.9" font-family="Inter,system-ui,sans-serif">feedback loop</text>
+
+  <!-- Side Effects -->
+  <g>
+    <rect x="164" y="264" width="200" height="58" rx="14" fill="url(#gTeal)" opacity="0.92"/>
+    <rect x="164" y="264" width="200" height="58" rx="14" fill="none" stroke="white" stroke-opacity="0.16" stroke-width="1.2"/>
+    <text x="264" y="286" text-anchor="middle" font-size="11" font-weight="900" fill="white" font-family="Inter,system-ui,sans-serif">✦ Side Effects</text>
+    <text x="264" y="304" text-anchor="middle" font-size="8" fill="white" opacity="0.92" font-family="Inter,system-ui,sans-serif">file · API · deploy · message</text>
+  </g>
+  <line x1="264" y1="240" x2="264" y2="262" stroke="#00d4aa" stroke-width="1.6" marker-end="url(#arrTeal)"/>
+
+  <!-- bottom note -->
+  <text x="264" y="338" text-anchor="middle" font-size="7" fill="#55608a" font-family="Inter,system-ui,sans-serif">每一層皆可觀測 · 每一步皆可重現 · 危險操作需審批</text>
+</svg>
+</div>
     <div class="stack">
       <div class="row"><div class="num">①</div><div><h4>宣告式配置</h4><p>用 YAML / JSON 宣告模型、工具、約束與記憶，而非散落的 prompt 字串。</p></div></div>
       <div class="row"><div class="num">②</div><div><h4>技能化能力</h4><p>將可重用流程封裝為 Skill（可發現、可組合、可審計）。</p></div></div>
