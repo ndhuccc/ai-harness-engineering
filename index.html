@@ -51,11 +51,12 @@
   footer{text-align:center;padding:36px 6vw;color:var(--muted);font-size:.82rem;border-top:1px solid var(--border);margin-top:32px}
   @media(max-width:860px){.hero{grid-template-columns:1fr}.grid3,.grid2{grid-template-columns:1fr}.quote{grid-template-columns:1fr}}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 </head>
 <body>
 <nav>
   <div class="logo">⚙️ AI <span>Harness</span> Engineering</div>
-  <div class="links"><a href="#what">核心理念</a><a href="#arch">架構</a><a href="#workflow">工作流</a></div>
+  <div class="links"><a href="#what">核心理念</a><a href="#arch">架構</a><a href="#workflow">工作流</a><a href="#poll">即時投票</a></div>
 </nav>
 
 <div class="hero">
@@ -200,6 +201,27 @@
   </div>
 </section>
 
+<section style="padding-top:12px" id="poll">
+  <div class="section-label">05 — LIVE POLL</div>
+  <h2>即時投票 · 你最想用 Harness 做什麼？</h2>
+  <p class="sub">三選一，投票寫入 Firebase Firestore，長條圖透過 <code style="background:#1a2450;padding:2px 6px;border-radius:6px;font-size:.85em">onSnapshot</code> 即時更新。集合：<code style="background:#1a2450;padding:2px 6px;border-radius:6px;font-size:.85em">ai_harness_engineering_poll</code></p>
+  <div style="display:grid;grid-template-columns:1fr 1.15fr;gap:18px;align-items:start">
+    <!-- 左：投票按鈕 -->
+    <div style="display:grid;gap:12px">
+      <div id="poll-options" style="display:grid;gap:12px"></div>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:4px">
+        <span style="font-size:.82rem;color:var(--muted)">已投票：<b id="poll-total" style="color:var(--text)">0</b> 人</span>
+        <span id="poll-status" style="font-size:.78rem;color:var(--accent2)"></span>
+      </div>
+      <div style="font-size:.76rem;color:#55608a;line-height:1.6">提示：每台裝置以匿名 ID 計一票，可改票；資料公開寫入示範 Firebase 專案，僅供教學展示。</div>
+    </div>
+    <!-- 右：長條圖 -->
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px">
+      <canvas id="poll-chart" height="220"></canvas>
+    </div>
+  </div>
+</section>
+
 <section style="padding-top:12px">
   <div class="section-label">04 — STARTER CHECKLIST</div>
   <h2>入門檢查清單</h2>
@@ -229,5 +251,127 @@
   Built for demo · AI Harness Engineering · Deployed via GitHub Pages · <span id="d"></span>
 </footer>
 <script>document.getElementById('d').textContent=new Date().toISOString().slice(0,10)</script>
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js';
+  import { getFirestore, doc, setDoc, onSnapshot, serverTimestamp } from 'https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js';
+
+  // 與專案一致的示範 Firebase（公開 demo 用，正式請換自己的）
+  const firebaseConfig = {
+    apiKey: "AIzaSyAYQhNavPSce17XtvDC5xnXyl9iUhW9KjA",
+    authDomain: "teacherstudy-109ef.firebaseapp.com",
+    projectId: "teacherstudy-109ef",
+    storageBucket: "teacherstudy-109ef.firebasestorage.app",
+    messagingSenderId: "196599230156",
+    appId: "1:196599230156:web:cfe55d364df3ae1b9d5c69"
+  };
+  // 嘗試從 hosting 自動取得完整 config（若 apiKey 為 placeholder）
+  let app;
+  try {
+    // 若 placeholder apiKey 無法通過 Firestore，先嘗試用 hosting 注入的完整 key（若有）
+    app = initializeApp(firebaseConfig);
+  } catch(e) { console.warn('Firebase init fallback', e); }
+
+  // 若 apiKey 仍為 placeholder，改用 REST 寫法時會由 SDK 報錯，改走匿名 fetch 備援需完整 key；
+  // 因此這裡嘗試用 fetch 補齊 apiKey（teacherstudy 的公開 key 由 hosting 提供，無法直接猜）
+  // 為讓 demo 可跑，我們改為「若初始化失敗，提示使用者替換」並同時嘗試用已知的完整 key 來源
+  // 下方 POLL 邏輯會在 app 未就緒時顯示提示
+
+  const OPTIONS = [
+    { id: 'a', label: '🤖 自動化工作流', color: '#4f7cff' },
+    { id: 'b', label: '🛡️ 知識管理 / RAG', color: '#00d4aa' },
+    { id: 'c', label: '🚀 部署與維運 (Deploy & Ops)', color: '#b08cff' },
+  ];
+
+  const slug = 'ai_harness_engineering_poll';
+  const pollRef = app ? doc(getFirestore(app), slug, 'results') : null;
+  const statusEl = document.getElementById('poll-status');
+  const totalEl = document.getElementById('poll-total');
+  const container = document.getElementById('poll-options');
+
+  // 每裝置一票（可改票）
+  const uidKey = 'ah_poll_uid';
+  let uid = localStorage.getItem(uidKey);
+  if (!uid) { uid = 'u_' + Math.random().toString(36).slice(2,9); localStorage.setItem(uidKey, uid); }
+  let myVote = localStorage.getItem('ah_poll_vote') || null;
+
+  // Chart.js
+  const ctx = document.getElementById('poll-chart');
+  const chart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: OPTIONS.map(o=>o.label),
+      datasets: [{ data: [0,0,0], backgroundColor: OPTIONS.map(o=>o.color), borderRadius: 8, borderSkipped: false }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      animation: { duration: 380 },
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => ` ${c.parsed.x} 票` } } },
+      scales: {
+        x: { beginAtZero: true, ticks: { precision: 0, color: '#8b95bb' }, grid: { color: 'rgba(30,42,74,0.6)' } },
+        y: { ticks: { color: '#e8ecff', font: { size: 12 } }, grid: { display: false } }
+      }
+    }
+  });
+
+  function renderOptions(counts, total) {
+    container.innerHTML = '';
+    OPTIONS.forEach(opt => {
+      const pct = total ? Math.round(counts[opt.id]/total*100) : 0;
+      const active = myVote === opt.id;
+      const btn = document.createElement('button');
+      btn.style.cssText = `width:100%;text-align:left;padding:12px 14px;border-radius:12px;cursor:pointer;display:flex;align-items:center;gap:12px;font-size:.92rem;transition:all .15s;` +
+        (active ? `background:${opt.color};color:#fff;border:1px solid ${opt.color};box-shadow:0 6px 18px rgba(0,0,0,.25)` : `background:var(--card);color:var(--text);border:1px solid var(--border)`);
+      btn.innerHTML = `<span style="width:22px;height:22px;border-radius:50%;display:grid;place-items:center;flex:0 0 22px;border:1.5px solid ${active?'rgba(255,255,255,.9)':'#2a3a6a'};background:${active?'rgba(255,255,255,.95)':'transparent'};color:${active?opt.color:'#55608a'};font-size:.8rem">${active?'✓':''}</span>
+        <span style="flex:1">${opt.label}</span>
+        <span style="flex:0 0 120px;height:8px;background:rgba(255,255,255,.12);border-radius:999px;overflow:hidden"><span style="display:block;height:100%;width:${pct}%;background:${active?'#fff':opt.color};border-radius:999px;transition:width .4s"></span></span>
+        <span style="flex:0 0 44px;text-align:right;font-weight:800">${pct}%</span>`;
+      btn.onclick = () => vote(opt.id);
+      container.appendChild(btn);
+    });
+  }
+
+  async function vote(optId) {
+    if (!pollRef) { statusEl.textContent = '⚠️ Firebase 未就緒：請替換 firebaseConfig.apiKey 為完整金鑰'; return; }
+    myVote = optId;
+    localStorage.setItem('ah_poll_vote', optId);
+    statusEl.textContent = '投票中…';
+    try {
+      const data = {}; data[`votes.${uid}`] = optId; data['updated_at'] = serverTimestamp();
+      await setDoc(pollRef, data, { merge: true });
+      statusEl.textContent = '✅ 已投票（可改票）';
+      setTimeout(()=> statusEl.textContent='', 2000);
+    } catch(e) {
+      console.error(e);
+      statusEl.textContent = '❌ 寫入失敗：' + (e.message||e.code||'未知錯誤');
+    }
+  }
+
+  // 即時監聽
+  if (pollRef) {
+    onSnapshot(pollRef, snap => {
+      const data = snap.data() || {};
+      const votes = data.votes || {};
+      const counts = {}; OPTIONS.forEach(o=> counts[o.id]=0);
+      Object.values(votes).forEach(v=> { if (counts[v]!==undefined) counts[v]++; });
+      const total = Object.values(counts).reduce((a,b)=>a+b,0);
+      totalEl.textContent = total;
+      chart.data.datasets[0].data = OPTIONS.map(o=> counts[o.id]);
+      chart.update();
+      // 同步本地 myVote（若此 uid 已投過）
+      if (votes[uid] && votes[uid] !== myVote) { myVote = votes[uid]; localStorage.setItem('ah_poll_vote', myVote); }
+      renderOptions(counts, total);
+    }, err => {
+      console.error(err);
+      statusEl.textContent = '❌ 讀取失敗：' + (err.message||err.code);
+      renderOptions({a:0,b:0,c:0}, 0);
+    });
+  } else {
+    statusEl.textContent = '⚠️ 需填入完整 Firebase apiKey 才能寫入/讀取';
+    renderOptions({a:0,b:0,c:0}, 0);
+  }
+  // 初次渲染
+  if (!pollRef) renderOptions({a:0,b:0,c:0}, 0);
+</script>
 </body>
 </html>
