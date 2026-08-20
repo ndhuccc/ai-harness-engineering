@@ -204,7 +204,7 @@
 <section style="padding-top:12px" id="poll">
   <div class="section-label">05 — LIVE POLL</div>
   <h2>即時投票 · 你最想用 Harness 做什麼？</h2>
-  <p class="sub">三選一，投票寫入 Firebase Firestore，長條圖透過 <code style="background:#1a2450;padding:2px 6px;border-radius:6px;font-size:.85em">onSnapshot</code> 即時更新。集合：<code style="background:#1a2450;padding:2px 6px;border-radius:6px;font-size:.85em">ai_harness_engineering_poll</code></p>
+  <p class="sub">三選一，投票寫入 Firebase Firestore，長條圖透過 <code style="background:#1a2450;padding:2px 6px;border-radius:6px;font-size:.85em">onSnapshot</code> 即時更新。集合：<code style="background:#1a2450;padding:2px 6px;border-radius:6px;font-size:.85em">eigenvalue-ai-harness-poll</code></p>
   <div style="display:grid;grid-template-columns:1fr 1.15fr;gap:18px;align-items:start">
     <!-- 左：投票按鈕 -->
     <div style="display:grid;gap:12px">
@@ -282,7 +282,7 @@
     { id: 'c', label: '🚀 部署與維運 (Deploy & Ops)', color: '#b08cff' },
   ];
 
-  const slug = 'ai_harness_engineering_poll';
+  const slug = 'eigenvalue-ai-harness-poll';
   const pollRef = app ? doc(getFirestore(app), slug, 'results') : null;
   const statusEl = document.getElementById('poll-status');
   const totalEl = document.getElementById('poll-total');
