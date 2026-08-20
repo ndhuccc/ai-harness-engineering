@@ -330,7 +330,7 @@
     localStorage.setItem('ah_poll_vote', optId);
     statusEl.textContent = '投票中…';
     try {
-      const data = {}; data[`votes.${uid}`] = optId; data['updated_at'] = serverTimestamp();
+      const data = { votes: { [uid]: optId }, updated_at: serverTimestamp() };
       await setDoc(pollRef, data, { merge: true });
       statusEl.textContent = '✅ 已投票（可改票）';
       setTimeout(()=> statusEl.textContent='', 2000);
