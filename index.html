@@ -255,26 +255,19 @@
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js';
   import { getFirestore, doc, setDoc, onSnapshot, serverTimestamp } from 'https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js';
 
-  // 與專案一致的示範 Firebase（公開 demo 用，正式請換自己的）
   const firebaseConfig = {
-    apiKey: "AIzaSyAYQhNavPSce17XtvDC5xnXyl9iUhW9KjA",
-    authDomain: "teacherstudy-109ef.firebaseapp.com",
-    projectId: "teacherstudy-109ef",
-    storageBucket: "teacherstudy-109ef.firebasestorage.app",
-    messagingSenderId: "196599230156",
-    appId: "1:196599230156:web:cfe55d364df3ae1b9d5c69"
+    apiKey: "AIzaSyDZ3Qs73Hb5PzZa46Apa60hP-2nKwGXSfk",
+    authDomain: "ai-harness-engineering.firebaseapp.com",
+    projectId: "ai-harness-engineering",
+    storageBucket: "ai-harness-engineering.firebasestorage.app",
+    messagingSenderId: "499988091579",
+    appId: "1:499988091579:web:7d5ecc434ab058a4598f9e",
+    measurementId: "G-NC44SEMEM2"
   };
-  // 嘗試從 hosting 自動取得完整 config（若 apiKey 為 placeholder）
   let app;
   try {
-    // 若 placeholder apiKey 無法通過 Firestore，先嘗試用 hosting 注入的完整 key（若有）
     app = initializeApp(firebaseConfig);
   } catch(e) { console.warn('Firebase init fallback', e); }
-
-  // 若 apiKey 仍為 placeholder，改用 REST 寫法時會由 SDK 報錯，改走匿名 fetch 備援需完整 key；
-  // 因此這裡嘗試用 fetch 補齊 apiKey（teacherstudy 的公開 key 由 hosting 提供，無法直接猜）
-  // 為讓 demo 可跑，我們改為「若初始化失敗，提示使用者替換」並同時嘗試用已知的完整 key 來源
-  // 下方 POLL 邏輯會在 app 未就緒時顯示提示
 
   const OPTIONS = [
     { id: 'a', label: '🤖 自動化工作流', color: '#4f7cff' },
